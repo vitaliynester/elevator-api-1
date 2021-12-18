@@ -325,9 +325,12 @@ def get_tasks():
 
 @app.route('/calc', methods=['POST'])
 def calc():
-    sensors = request.json
-    signal = get_signals(sensors)
-    return signal, 200
+    try:
+        sensors = request.json
+        signal = get_signals(sensors)
+        return signal, 200
+    except Exception as e:
+        return {"msg": str(e)}, 400
 
 def get_signals(sensors):
     global prev_sensors
