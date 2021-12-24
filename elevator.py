@@ -462,8 +462,6 @@ class Elevator(object):
 #         print_elevator_state(triggers[i], elevator.outputs_state, elevator.machine_state['current_floor'], elevator.machine_state['dest_floor'], elevator.state)
 #     except Exception as e:
 #         print(e)
-from transitions.extensions import GraphMachine
-
 from flask import Flask, request
 from flask_cors import CORS
 
@@ -471,8 +469,6 @@ app = Flask(__name__)
 CORS(app)
 
 elevator = Elevator()
-graph = GraphMachine(model=elevator, states=elevator.states, transitions=elevator.transitions, show_conditions=True)
-elevator.get_graph().draw('new_state_diagram.png', prog='dot')
 
 prev_sensors = None
 
@@ -491,7 +487,7 @@ def calc():
     return signal, 200
 
 
-@app.route('/refresh', methods=['PATCH'])
+@app.route('/refresh', methods=['GET'])
 def refresh():
     global elevator
     global prev_sensors
