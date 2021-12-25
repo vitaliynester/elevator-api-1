@@ -301,7 +301,7 @@ class Elevator(object):
         self.machine_state = {
             'current_floor': None,
             'dest_floor': None,
-            'stop': False
+            'passenger': False
         }
 
         self.machine = Machine(model=self,
