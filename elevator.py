@@ -73,10 +73,10 @@ class Elevator(object):
               {'name': 'go_down_fast', 'on_enter': 'set_go_down_fast', 'on_exit': 'reset_go_down_fast'},
               {'name': 'go_down_slow', 'on_enter': 'set_go_down_slow', 'on_exit': 'reset_go_down_slow'},
 
-              {'name': 'doors_opening', 'on_enter': 'set_doors_opening', 'on_exit': 'reset_doors_opening'},
-              {'name': 'doors_opened', 'on_enter': 'set_doors_opened'},
-              {'name': 'doors_closing', 'on_enter': 'set_doors_closing', 'on_exit': 'reset_doors_closing'},
-              {'name': 'doors_closed', 'on_enter': 'set_doors_closed'}
+              {'name': 'door_opening', 'on_enter': 'set_door_opening', 'on_exit': 'reset_door_opening'},
+              {'name': 'door_opened', 'on_enter': 'set_door_opened'},
+              {'name': 'door_closing', 'on_enter': 'set_door_closing', 'on_exit': 'reset_door_closing'},
+              {'name': 'door_closed', 'on_enter': 'set_door_closed'}
     ]
 
     transitions = [
@@ -121,7 +121,7 @@ class Elevator(object):
         {
             'trigger': 'fl_btn',
             'source': 'idle',
-            'dest': 'doors_opening',
+            'dest': 'door_opening',
             'prepare': 'set_dest_floor',
             'conditions': ['is_dest_floor']
         },
@@ -172,50 +172,50 @@ class Elevator(object):
         {
             'trigger': 'floor_sensor',
             'source': ['go_up_slow', 'go_down_slow'],
-            'dest': 'doors_opening',
+            'dest': 'door_opening',
             'conditions': ['is_dest_floor']
         },
 
-        # doors_opening
+        # door_opening
         {
-            'trigger': 'doors_opened_sensor',
-            'source': 'doors_opening',
-            'dest': 'doors_opened',
+            'trigger': 'door_opened_sensor',
+            'source': 'door_opening',
+            'dest': 'door_opened',
         },
 
-        # doors_opened
+        # door_opened
         {
             'trigger': 'pass_sensor',
-            'source': 'doors_opened',
-            'dest': 'doors_closing',
+            'source': 'door_opened',
+            'dest': 'door_closing',
         },
 
-        # doors_closing
+        # door_closing
         {
-            'trigger': 'doors_closed_sensor',
-            'source': 'doors_closing',
-            'dest': 'doors_closed',
+            'trigger': 'door_closed_sensor',
+            'source': 'door_closing',
+            'dest': 'door_closed',
         },
         {
             'trigger': 'obstacle_sensor',
-            'source': 'doors_closing',
-            'dest': 'doors_opening',
+            'source': 'door_closing',
+            'dest': 'door_opening',
         },
         {
-            'trigger': 'doors_open_btn',
-            'source': 'doors_closing',
-            'dest': 'doors_opening',
+            'trigger': 'door_open_btn',
+            'source': 'door_closing',
+            'dest': 'door_opening',
         },
 
-        # doors_closed
+        # door_closed
         {
-            'trigger': 'doors_open_btn',
-            'source': 'doors_closed',
-            'dest': 'doors_opening',
+            'trigger': 'door_open_btn',
+            'source': 'door_closed',
+            'dest': 'door_opening',
         },
         {
             'trigger': 'el_btn',
-            'source': 'doors_closed',
+            'source': 'door_closed',
             'dest': 'go_up_fast',
             'prepare': 'set_dest_floor',
             'after': 'turn_on_el_btn',
@@ -223,7 +223,7 @@ class Elevator(object):
         },
         {
             'trigger': 'el_btn',
-            'source': 'doors_closed',
+            'source': 'door_closed',
             'dest': 'go_down_fast',
             'prepare': 'set_dest_floor',
             'after': 'turn_on_el_btn',
@@ -231,14 +231,14 @@ class Elevator(object):
         },
         {
             'trigger': 'el_btn',
-            'source': 'doors_closed',
-            'dest': 'doors_opening',
+            'source': 'door_closed',
+            'dest': 'door_opening',
             'prepare': 'set_dest_floor',
             'conditions': ['is_dest_floor']
         },
         {
             'trigger': 'pass_sensor',
-            'source': 'doors_closed',
+            'source': 'door_closed',
             'dest': 'idle',
         },
     ]
@@ -255,13 +255,13 @@ class Elevator(object):
             'el_btn_3': 0,
             'el_btn_4': 0,
 
-            'open_doors_btn': 0,
+            'open_door_btn': 0,
             'stop_btn': 0,
 
             'pass_sensor': 0,
             'obstacle_sensor': 0,
-            'doors_opened_sensor': 0,
-            'doors_closed_sensor': 0,
+            'door_opened_sensor': 0,
+            'door_closed_sensor': 0,
 
             'stopping_sensor_1': 0,
             'stopping_sensor_2': 0,
@@ -294,8 +294,8 @@ class Elevator(object):
             'go_down_fast': 0,
             'go_down_slow': 0,
 
-            'open_doors': 0,
-            'close_doors': 0
+            'open_door': 0,
+            'close_door': 0
         }
 
         self.machine_state = {
@@ -344,13 +344,13 @@ class Elevator(object):
     def reset_go_down_slow(self, event: EventData):
         self.outputs_state['go_down_slow'] = 0
 
-    def set_doors_opening(self, event: EventData):
-        self.outputs_state['open_doors'] = 1
+    def set_door_opening(self, event: EventData):
+        self.outputs_state['open_door'] = 1
 
-    def reset_doors_opening(self, event: EventData):
-        self.outputs_state['open_doors'] = 0
+    def reset_door_opening(self, event: EventData):
+        self.outputs_state['open_door'] = 0
 
-    def set_doors_opened(self, event: EventData):
+    def set_door_opened(self, event: EventData):
         self.outputs_state['fl_light_1'] = 0
         self.outputs_state['fl_light_2'] = 0
         self.outputs_state['fl_light_3'] = 0
@@ -361,14 +361,14 @@ class Elevator(object):
         self.outputs_state['el_light_3'] = 0
         self.outputs_state['el_light_4'] = 0
 
-    def set_doors_closing(self, event: EventData):
-        self.outputs_state['close_doors'] = 1
+    def set_door_closing(self, event: EventData):
+        self.outputs_state['close_door'] = 1
 
-    def reset_doors_closing(self, event: EventData):
-        self.outputs_state['close_doors'] = 0
+    def reset_door_closing(self, event: EventData):
+        self.outputs_state['close_door'] = 0
 
-    def set_doors_closed(self, event: EventData):
-        self.outputs_state['close_doors'] = 0
+    def set_door_closed(self, event: EventData):
+        self.outputs_state['close_door'] = 0
 
     def set_current_floor(self, event: EventData):
         floor_sensor_code = event.kwargs.get('floor_sensor_code')
