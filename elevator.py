@@ -57,7 +57,7 @@ outputs_state = {
 machine_state = {
     'current_floor': None,
     'dest_floor': None,
-    'stop': False
+    'passenger': False
 }
 
 
@@ -308,7 +308,8 @@ class Elevator(object):
                                states=Elevator.states,
                                transitions=Elevator.transitions,
                                initial='init',
-                               send_event=True)
+                               send_event=True,
+                               auto_transitions=True)
 
     def set_initial_search(self, event: EventData):
         self.outputs_state['go_down_slow'] = 1
@@ -361,8 +362,9 @@ class Elevator(object):
         self.outputs_state['el_light_3'] = 0
         self.outputs_state['el_light_4'] = 0
 
-    def set_door_closing(self, event: EventData):
-        self.outputs_state['close_door'] = 1
+    def set_doors_closing(self, event: EventData):
+        self.outputs_state['close_doors'] = 1
+        self.machine_state['passenger'] = not self.machine_state['passenger']
 
     def reset_door_closing(self, event: EventData):
         self.outputs_state['close_door'] = 0
@@ -488,6 +490,9 @@ def calc():
     global elevator
     sensors = request.json
     signal = get_signals(sensors)
+    if elevator.state == 'door_closed' and not elevator.machine_state['passenger']:
+        elevator.to_idle()
+        signal = elevator.outputs_state
     signal['machine_state'] = elevator.machine_state
     signal['state'] = elevator.state
     return signal, 200
