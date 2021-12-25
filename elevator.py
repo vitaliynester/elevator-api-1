@@ -489,6 +489,7 @@ def calc():
     sensors = request.json
     signal = get_signals(sensors)
     signal['machine_state'] = elevator.machine_state
+    signal['state'] = elevator.state
     return signal, 200
 
 
