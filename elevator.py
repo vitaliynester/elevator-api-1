@@ -62,6 +62,7 @@ machine_state = {
 
 
 class Elevator(object):
+
     states = [{'name': 'init'},
               {'name': 'initial_search', 'on_enter': 'set_initial_search', 'on_exit': 'reset_initial_search'},
               {'name': 'idle', 'on_enter': 'set_idle'},
@@ -72,11 +73,11 @@ class Elevator(object):
               {'name': 'go_down_fast', 'on_enter': 'set_go_down_fast', 'on_exit': 'reset_go_down_fast'},
               {'name': 'go_down_slow', 'on_enter': 'set_go_down_slow', 'on_exit': 'reset_go_down_slow'},
 
-              {'name': 'doors_opening', 'on_enter': 'set_doors_opening'},
-              {'name': 'doors_opened', 'on_enter': 'set_doors_opened', 'on_exit': 'reset_doors_opened'},
-              {'name': 'doors_closing', 'on_enter': 'set_doors_closing'},
+              {'name': 'doors_opening', 'on_enter': 'set_doors_opening', 'on_exit': 'reset_doors_opening'},
+              {'name': 'doors_opened', 'on_enter': 'set_doors_opened'},
+              {'name': 'doors_closing', 'on_enter': 'set_doors_closing', 'on_exit': 'reset_doors_closing'},
               {'name': 'doors_closed', 'on_enter': 'set_doors_closed'}
-              ]
+    ]
 
     transitions = [
         # init
@@ -346,9 +347,10 @@ class Elevator(object):
     def set_doors_opening(self, event: EventData):
         self.outputs_state['open_doors'] = 1
 
-    def set_doors_opened(self, event: EventData):
+    def reset_doors_opening(self, event: EventData):
         self.outputs_state['open_doors'] = 0
 
+    def set_doors_opened(self, event: EventData):
         self.outputs_state['fl_light_1'] = 0
         self.outputs_state['fl_light_2'] = 0
         self.outputs_state['fl_light_3'] = 0
@@ -361,6 +363,9 @@ class Elevator(object):
 
     def set_doors_closing(self, event: EventData):
         self.outputs_state['close_doors'] = 1
+
+    def reset_doors_closing(self, event: EventData):
+        self.outputs_state['close_doors'] = 0
 
     def set_doors_closed(self, event: EventData):
         self.outputs_state['close_doors'] = 0
