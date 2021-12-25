@@ -11,13 +11,13 @@ inputs_state = {
     'el_btn_3': 0,
     'el_btn_4': 0,
 
-    'open_doors_btn': 0,
+    'open_door_btn': 0,
     'stop_btn': 0,
 
     'pass_sensor': 0,
     'obstacle_sensor': 0,
-    'doors_opened_sensor': 0,
-    'doors_closed_sensor': 0,
+    'door_opened_sensor': 0,
+    'door_closed_sensor': 0,
 
     'stopping_sensor_1': 0,
     'stopping_sensor_2': 0,
@@ -50,8 +50,8 @@ outputs_state = {
     'go_down_fast': 0,
     'go_down_slow': 0,
 
-    'open_doors': 0,
-    'close_doors': 0
+    'open_door': 0,
+    'close_door': 0
 }
 
 machine_state = {
@@ -62,7 +62,6 @@ machine_state = {
 
 
 class Elevator(object):
-
     states = [{'name': 'init'},
               {'name': 'initial_search', 'on_enter': 'set_initial_search', 'on_exit': 'reset_initial_search'},
               {'name': 'idle', 'on_enter': 'set_idle'},
@@ -77,7 +76,7 @@ class Elevator(object):
               {'name': 'door_opened', 'on_enter': 'set_door_opened'},
               {'name': 'door_closing', 'on_enter': 'set_door_closing', 'on_exit': 'reset_door_closing'},
               {'name': 'door_closed', 'on_enter': 'set_door_closed'}
-    ]
+              ]
 
     transitions = [
         # init
@@ -362,8 +361,8 @@ class Elevator(object):
         self.outputs_state['el_light_3'] = 0
         self.outputs_state['el_light_4'] = 0
 
-    def set_doors_closing(self, event: EventData):
-        self.outputs_state['close_doors'] = 1
+    def set_door_closing(self, event: EventData):
+        self.outputs_state['close_door'] = 1
         self.machine_state['passenger'] = not self.machine_state['passenger']
 
     def reset_door_closing(self, event: EventData):
@@ -431,11 +430,11 @@ class Elevator(object):
 #     "el_btn_2",
 #     "el_btn_3",
 #     "el_btn_4",
-#     "open_doors_btn",
+#     "open_door_btn",
 #     "pass_sensor",
 #     "obstacle_sensor",
-#     "doors_opened_sensor",
-#     "doors_closed_sensor",
+#     "door_opened_sensor",
+#     "door_closed_sensor",
 #     "stopping_sensor_1",
 #     "stopping_sensor_2",
 #  "stopping_sensor_3",
@@ -469,6 +468,9 @@ class Elevator(object):
 #         print_elevator_state(triggers[i], elevator.outputs_state, elevator.machine_state['current_floor'], elevator.machine_state['dest_floor'], elevator.state)
 #     except Exception as e:
 #         print(e)
+# from transitions.extensions import GraphMachine
+
+
 from flask import Flask, request
 from flask_cors import CORS
 
@@ -476,6 +478,8 @@ app = Flask(__name__)
 CORS(app)
 
 elevator = Elevator()
+# graph = GraphMachine(model=elevator, states=elevator.states, transitions=elevator.transitions, show_conditions=True)
+# elevator.get_graph().draw('new_state_diagram.png', prog='dot')
 
 prev_sensors = None
 
@@ -493,7 +497,7 @@ def calc():
     if elevator.state == 'door_closed' and not elevator.machine_state['passenger']:
         elevator.to_idle()
         signal = elevator.outputs_state
-    signal['machine_state'] = elevator.machine_state
+
     signal['state'] = elevator.state
     return signal, 200
 
